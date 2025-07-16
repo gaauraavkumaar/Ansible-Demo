@@ -1,0 +1,39 @@
+---
+- name: Install Docker and run nginx container
+  hosts: gaurav_vm
+  become: yes
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Enable and start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Install pip3 (Python package manager)
+      apt:
+        name: python3-pip
+        state: present
+
+    - name: Install Python Docker SDK (required for docker_container module)
+      pip:
+        name: docker
+        executable: pip3
+
+    - name: Run nginx container
+      docker_container:
+        name: nginx
+        image: nginx
+        state: started
+        restart_policy: always
+        ports:
+          - "80:80"
